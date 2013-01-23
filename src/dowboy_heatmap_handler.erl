@@ -36,7 +36,6 @@ function heat_tracer() {
     var socket = new WebSocket(window.location.href.replace(/^http/, 'ws'));
 
     socket.onopen = function() {
-	    console.log('on connection');
 	    var dscript = \"syscall:::entry\\n{\\nself->syscall_entry_ts[probefunc] = vtimestamp;\\n}\\nsyscall:::return\\n/self->syscall_entry_ts[probefunc]/\\n{\\n\\n@time[probefunc] = lquantize((vtimestamp - self->syscall_entry_ts[probefunc] ) / 1000, 0, 63, 2);\\nself->syscall_entry_ts[probefunc] = 0;\\n}\";
 	    socket.send(dscript);
 	};
@@ -46,7 +45,6 @@ function heat_tracer() {
        on connection. */
     socket.onmessage = function(message){
         var message = JSON.parse(message.data);
-	    console.log( message );
 	    draw(message);
 
 	    /* for ( key in message ) {
@@ -151,7 +149,7 @@ websocket_handle({text, Msg}, Req, State) ->
     Msg1 = binary_to_list(Msg),
     erltrace:compile(Handle, Msg1),
     erltrace:go(Handle),
-    io:format("> ~p~n", [Msg]),
+    io:format("SCRIPT> ~s~n", [Msg]),
 	{ok, Req, {Msg1, Handle}};
 
 websocket_handle(_Any, Req, State) ->
@@ -161,7 +159,6 @@ websocket_info(tick, Req, {Msg, Handle} = State) ->
      case erltrace:walk(Handle) of
          {ok, R} ->
              JSON = [{list_to_binary(Call),[ [[S, E], V]|| {{S, E}, V} <- Vs]}|| {lquantize, [Call], Vs} <- R],
-             io:format("< ~p~n", [JSON]),
              {reply, {text, jsx:encode(JSON)}, Req, State, hibernate};
          _ ->
              try
@@ -172,7 +169,6 @@ websocket_info(tick, Req, {Msg, Handle} = State) ->
              end,
              {ok, Handle1} = erltrace:open(),
              erltrace:compile(Handle1, Msg),
-
              {ok, Req, {Msg, Handle1}}
      end;
 

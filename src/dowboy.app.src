@@ -5,7 +5,10 @@
   {registered, []},
   {applications, [
                   kernel,
-                  stdlib
+                  stdlib,
+                  jsx,
+                  cowboy,
+                  erltrace
                  ]},
   {mod, { dowboy_app, []}},
   {env, []}
