@@ -160,13 +160,10 @@ websocket_info(tick, Req, {Msg, Handle} = State) ->
          {ok, R} ->
              JSON = [{list_to_binary(Call),[ [[S, E], V]|| {{S, E}, V} <- Vs]}|| {lquantize, [Call], Vs} <- R],
              {reply, {text, jsx:encode(JSON)}, Req, State, hibernate};
+         ok ->
+             {ok, Req, {Msg, Handle1}};
          Other ->
-             case Other of
-                 {error, E} ->
-                     io:format("Error: ~p", [E]);
-                 _ ->
-                     ok
-             end,
+             io:format("Error: ~p", [E]),
              try
                  erltrace:stop(Handle)
              catch
@@ -175,6 +172,7 @@ websocket_info(tick, Req, {Msg, Handle} = State) ->
              end,
              {ok, Handle1} = erltrace:open(),
              erltrace:compile(Handle1, Msg),
+             erltrace:go(Handle),
              {ok, Req, {Msg, Handle1}}
      end;
 
