@@ -33,7 +33,7 @@ function heat_tracer() {
     if ('MozWebSocket' in window) {
 		WebSocket = MozWebSocket;
 	}
-    var socket = new WebSocket('ws://localhost:8080/websocket');
+    var socket = new WebSocket(window.location.href.replace(/^http/, 'ws'));
 
     socket.onopen = function() {
 	    console.log('on connection');
