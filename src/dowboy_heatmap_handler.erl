@@ -139,16 +139,19 @@ websocket_init(_Any, Req, []) ->
 	{ok, Req2, undefined, hibernate}.
 
 websocket_handle({text, Msg}, Req, State) ->
+    %% We create a new handler
     {ok, Handle} = case State of
                        undefined ->
                            erltrace:open();
                        {Old} ->
+                           %% But we want to make sure that any old one is closed first.
                            erltrace:close(Old),
                            erltrace:open()
                    end,
+    %% We've to confert cowboys binary to a list.
     Msg1 = binary_to_list(Msg),
-    erltrace:compile(Handle, Msg1),
-    erltrace:go(Handle),
+    ok = erltrace:compile(Handle, Msg1),
+    ok = erltrace:go(Handle),
     io:format("SCRIPT> ~s~n", [Msg]),
 	{ok, Req, {Msg1, Handle}};
 
