@@ -22,7 +22,7 @@ handle(Req, State) ->
 <title>List</title>
 </head>
 <body onLoad='list_tracer()'>
-<textarea id='t' style='width: 800px; height: 300px;'>
+<textarea id='t' style='width: 800px; height: 150px;'>
 erlang*:::global-function-entry
 {
   self->funcall_entry_ts[copyinstr(arg1)] = vtimestamp;

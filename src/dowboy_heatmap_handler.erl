@@ -22,7 +22,7 @@ handle(Req, State) ->
 <title>Heatmap</title>
 </head>
 <body onLoad='heat_tracer()'>
-<textarea id='t' style='width: 800px; height: 300px;'>
+<textarea id='t' style='width: 800px; height: 150px;'>
 syscall:::entry
 {
   self->syscall_entry_ts[probefunc] = vtimestamp;
