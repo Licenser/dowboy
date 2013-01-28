@@ -12,7 +12,8 @@
 start(_StartType, _StartArgs) ->
     Dispatch = [
                 {'_', [
-                       {'_', dowboy_heatmap_handler, []}
+                       {[<<"heatmap">>], dowboy_heatmap_handler, []},
+                       {[<<"list">>], dowboy_sum_handler, []}
                       ]}
                ],
     {ok, _} = cowboy:start_listener(my_http_listener, 100,
