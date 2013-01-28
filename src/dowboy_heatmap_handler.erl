@@ -21,10 +21,28 @@ handle(Req, State) ->
 <head>
 </head>
 <body onLoad='heat_tracer()'>
+<textarea id='t' style='width: 800px; height: 300px;'>
+syscall:::entry
+{
+  self->syscall_entry_ts[probefunc] = vtimestamp;
+}
+syscall:::return
+/self->syscall_entry_ts[probefunc]/
+{
+  @time[probefunc] = lquantize((vtimestamp - self->syscall_entry_ts[probefunc] ) / 1000, 0, 63, 2);
+  self->syscall_entry_ts[probefunc] = 0;
+}
+</textarea><button onclick='b()'>Run</button><br/>
+
 <canvas id='canvas' width='1024' height='512'></canvas>
 <script>
 /* On load we create our web socket (or flash socket if your browser doesn't support it ) and
    send the d script we wish to be tracing. This extremely powerful and *insecure*. */
+socket = undefined;
+function b() {
+  socket.send(document.getElementById('t').value);
+}
+
 function heat_tracer() {
 
     //Global vars
@@ -33,13 +51,7 @@ function heat_tracer() {
     if ('MozWebSocket' in window) {
 		WebSocket = MozWebSocket;
 	}
-    var socket = new WebSocket(window.location.href.replace(/^http/, 'ws'));
-
-    socket.onopen = function() {
-	    var dscript = \"syscall:::entry\\n{\\nself->syscall_entry_ts[probefunc] = vtimestamp;\\n}\\nsyscall:::return\\n/self->syscall_entry_ts[probefunc]/\\n{\\n\\n@time[probefunc] = lquantize((vtimestamp - self->syscall_entry_ts[probefunc] ) / 1000, 0, 63, 2);\\nself->syscall_entry_ts[probefunc] = 0;\\n}\";
-	    socket.send(dscript);
-	};
-
+    socket = new WebSocket(window.location.href.replace(/^http/, 'ws'));
 
     /* The only messages we recieve should contain contain the dtrace aggregation data we requested
        on connection. */
@@ -145,7 +157,7 @@ websocket_handle({text, Msg}, Req, State) ->
                            erltrace:open();
                        {Old} ->
                            %% But we want to make sure that any old one is closed first.
-                           erltrace:close(Old),
+                           erltrace:stop(Old),
                            erltrace:open()
                    end,
     %% We've to confert cowboys binary to a list.
@@ -181,7 +193,6 @@ websocket_info(tick, Req, {Msg, Handle} = State) ->
 
 websocket_info(_Info, Req, State) ->
 	{ok, Req, State, hibernate}.
-
 
 websocket_terminate(_Reason, _Req, {_, Handle}) ->
     erltrace:stop(Handle),
