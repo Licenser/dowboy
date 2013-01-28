@@ -18,5 +18,5 @@ fibo(N) when N > 1 ->
 
 load(N) ->
     {T, R} =timer:tc(fun fibo/1, [N]),
-    io:format("fib(~p) took ~.2gs~n", [N, T]),
+    io:format("fib(~p) took ~.2gs~n", [N, T/1000/1000]),
     R.
