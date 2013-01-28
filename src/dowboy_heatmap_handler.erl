@@ -173,7 +173,7 @@ websocket_handle(_Any, Req, State) ->
 websocket_info(tick, Req, {Msg, Handle} = State) ->
      case erltrace:walk(Handle) of
          {ok, R} ->
-             JSON = [{list_to_binary(Call),[ [[S, E], V]|| {{S, E}, V} <- Vs]}|| {lquantize, [Call], Vs} <- R],
+             JSON = [{list_to_binary(Call),[ [[S, E], V]|| {{S, E}, V} <- Vs]}|| {_, [Call], Vs} <- R],
              {reply, {text, jsx:encode(JSON)}, Req, State, hibernate};
          ok ->
              {ok, Req, {Msg, Handle}};
