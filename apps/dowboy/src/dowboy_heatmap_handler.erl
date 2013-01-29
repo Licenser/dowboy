@@ -154,9 +154,9 @@ websocket_init(_Any, Req, []) ->
 websocket_handle({text, <<>>}, Req, State = {_, undefined}) ->
     {ok, Req, State};
 
-websocket_handle({text, <<>>}, Req, State = {_, Handle}) ->
+websocket_handle({text, <<>>}, Req, {M, Handle}) ->
     erltrace:stop(Handle),
-    {ok, Req, State};
+    {ok, Req, {M, undefined}};
 
 websocket_handle({text, Msg}, Req, State) ->
     %% We create a new handler
