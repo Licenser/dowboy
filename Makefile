@@ -8,7 +8,7 @@ deps:
 	./rebar get-deps
 
 console: all
-	 erl -pa deps/*/ebin ebin -s dowboy
+	 erl -pa deps/*/ebin apps/dowboy/ebin -s dowboy
 
 rel: all
 	./rebar generate

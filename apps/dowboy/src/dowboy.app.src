@@ -7,6 +7,7 @@
                   kernel,
                   stdlib,
                   jsx,
+                  jsxd,
                   cowboy,
                   erltrace
                  ]},
