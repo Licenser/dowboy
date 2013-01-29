@@ -9,3 +9,6 @@ deps:
 
 console: all
 	 erl -pa deps/*/ebin ebin -s dowboy
+
+rel: all
+	./rebar generate
