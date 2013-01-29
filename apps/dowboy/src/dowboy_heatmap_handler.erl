@@ -186,7 +186,14 @@ websocket_info(tick, Req, {_, undefined} = State) ->
 websocket_info(tick, Req, {Msg, Handle} = State) ->
      case erltrace:walk(Handle) of
          {ok, R} ->
-             JSON = [{list_to_binary(Call),[ [[S, E], V]|| {{S, E}, V} <- Vs]}|| {_, [Call], Vs} <- R],
+             JSON = lists:foldl(fun ({_, Call, Vs}, Obj) ->
+                                        CallB = lists:map(fun (X) when is_list(X)->
+                                                                  list_to_binary(X);
+                                                              (X) when is_number(X) ->
+                                                                  X
+                                                          end, Call),
+                                        jsxd:set(CallB, [[[S, E], V]|| {{S, E}, V} <- Vs], Obj)
+                                end, [], R),
              {reply, {text, jsx:encode(JSON)}, Req, State, hibernate};
          ok ->
              {ok, Req, {Msg, Handle}};
