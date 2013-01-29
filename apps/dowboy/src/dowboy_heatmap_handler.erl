@@ -151,6 +151,13 @@ websocket_init(_Any, Req, []) ->
 	Req2 = cowboy_http_req:compact(Req),
 	{ok, Req2, undefined, hibernate}.
 
+websocket_handle({text, <<>>}, Req, State = {_, undefined}) ->
+    {ok, Req, State};
+
+websocket_handle({text, <<>>}, Req, State = {_, Handle}) ->
+    erltrace:stop(Handle),
+    {ok, Req, State};
+
 websocket_handle({text, Msg}, Req, State) ->
     %% We create a new handler
     {ok, Handle} = case State of

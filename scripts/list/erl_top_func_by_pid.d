@@ -1,3 +1,7 @@
+/*
+ * Measures how long erlang spends in each function and grouped by PID.
+ * This is kind of like profiling.
+ */
 erlang*:::global-function-entry
 {
   self->funcall_entry_ts[copyinstr(arg1), copyinstr(arg0)] = vtimestamp;
