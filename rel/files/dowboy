@@ -3,6 +3,7 @@
 # ex: ts=4 sw=4 et
 
 RUNNER_SCRIPT_DIR=$(cd ${0%/*} && pwd)
+export LD_LIBRARY_PATH="/usr/gnu/lib/amd64"
 
 CALLER_DIR=$PWD
 
