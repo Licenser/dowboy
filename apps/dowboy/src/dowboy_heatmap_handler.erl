@@ -161,9 +161,9 @@ websocket_handle({text, <<>>}, Req, State = {_, Handle}) ->
 websocket_handle({text, Msg}, Req, State) ->
     %% We create a new handler
     {ok, Handle} = case State of
-                       undefined ->
+                       {_, undefined} ->
                            erltrace:open();
-                       {Old} ->
+                       {_, Old} ->
                            %% But we want to make sure that any old one is closed first.
                            erltrace:stop(Old),
                            erltrace:open()
