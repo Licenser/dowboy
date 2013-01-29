@@ -134,6 +134,8 @@ websocket_handle({text, Msg}, Req, State) ->
 
 websocket_handle(_Any, Req, State) ->
 	{ok, Req, State}.
+websocket_info(tick, Req, {_, undefined} = State) ->
+    {ok, Req, State};
 
 websocket_info(tick, Req, {Msg, Handle} = State) ->
      case erltrace:walk(Handle) of
@@ -161,6 +163,9 @@ websocket_info(tick, Req, {Msg, Handle} = State) ->
 
 websocket_info(_Info, Req, State) ->
 	{ok, Req, State, hibernate}.
+
+websocket_terminate(_Reason, _Req, {_, undefined}) ->
+    ok;
 
 websocket_terminate(_Reason, _Req, {_, Handle}) ->
     erltrace:stop(Handle),
