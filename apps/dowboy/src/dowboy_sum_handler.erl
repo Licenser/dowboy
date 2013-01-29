@@ -42,7 +42,7 @@ function b() {
   socket.send(document.getElementById('t').value);
 }
 
-function s() {socket.send("")};
+function s() {socket.send('')};
 
 function kv_sort(obj) {
  	var s = [];

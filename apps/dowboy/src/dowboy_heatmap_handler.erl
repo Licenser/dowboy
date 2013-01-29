@@ -44,7 +44,7 @@ function b() {
   socket.send(document.getElementById('t').value);
 }
 
-function s() {socket.send("")};
+function s() {socket.send('stop')};
 
 function heat_tracer() {
 
