@@ -31,13 +31,8 @@ erlang*:::function-return
 {
   @time[copyinstr(arg1)] = sum((vtimestamp - self->funcall_entry_ts[copyinstr(arg1)] ) / 1000);
 }</textarea><button onclick='b()'>Run</button><br/>
-<table>
-<thead>
-<tr><td>Function</td><td>Time</td></tr>
-</thead>
-<tbody id='tab'>
-</tbody>
-</table>
+<p id='tab'>
+</p>
 <script>
 /* On load we create our web socket (or flash socket if your browser doesn't support it ) and
    send the d script we wish to be tracing. This extremely powerful and *insecure*. */
@@ -47,6 +42,40 @@ function b() {
   socket.send(document.getElementById('t').value);
 }
 
+function kv_sort(obj) {
+ 	var s = [];
+    for (k in obj) {
+        var v = obj[k];
+        if (typeof v == 'object') {
+            s.push([k, kv_sort(v)]);
+        } else {
+            s.push([k, v]);
+        };
+    };
+    s = s.sort(function(a, b) {
+        if (typeof a[1] == 'object')
+            return b[1] - a[1]
+        else
+            return b[0] - a[0]
+    });
+    return s;
+}
+
+function kv_to_ul(obj) {
+    var s = '<ul>'
+    if (typeof obj[0][1] == 'number') {
+        obj.forEach(function(e) {
+            s = s + '<li>' + e[0] + ' - ' + e[1] + '</li>';
+        });
+    } else {
+        obj.forEach(function(e) {
+            if (e[1].length > 0) {
+                s = s + '<li>' + e[0] + ' - ' + kv_to_ul(e[1]) + '</li>';
+            }
+        });
+    }
+    return s + '</ul>';
+}
 function list_tracer() {
 
     //Global vars
@@ -61,24 +90,7 @@ function list_tracer() {
     socket.onmessage = function(message){
         var message = JSON.parse(message.data);
         var tab = document.getElementById('tab');
-        tab.innerHTML = '';
-	    for ( key in message ) {
-           if (times[key]) {
-             times[key] = times[key] + message[key];
-           } else {
-             times[key] = + message[key];
-           }
-	    }
-        var s = [];
-        for (k in times) {
-          s.push([k, times[k]]);
-        };
-        s.sort(function(a, b) {return b[1] - a[1]});
-        s.forEach(function(e) {
-           var tr = '<tr><td>' + e[0] + '</td><td>' + e[1] + '</td></tr>';
-           tab.innerHTML = tab.innerHTML + tr;
-        });
-
+        tab.innerHTML = kv_to_ul(kv_sort(message));
 	};
 
 }
@@ -119,7 +131,10 @@ websocket_handle(_Any, Req, State) ->
 websocket_info(tick, Req, {Msg, Handle} = State) ->
      case erltrace:walk(Handle) of
          {ok, R} ->
-             JSON = [{list_to_binary(Call), V} || {_, [Call], V} <- R],
+             JSON = lists:foldl(fun ({_, Call, V}, Obj) ->
+                                        CallB = lists:map(fun list_to_binary/1, Call),
+                                        jsxd:set(CallB, V, Obj)
+                                end, [], R),
              {reply, {text, jsx:encode(JSON)}, Req, State, hibernate};
          ok ->
              {ok, Req, {Msg, Handle}};
