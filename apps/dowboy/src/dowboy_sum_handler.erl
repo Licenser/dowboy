@@ -30,7 +30,7 @@ erlang*:::global-function-entry
 erlang*:::function-return
 {
   @time[copyinstr(arg1)] = sum((vtimestamp - self->funcall_entry_ts[copyinstr(arg1)] ) / 1000);
-}</textarea><button onclick='b()'>Run</button><br/>
+}</textarea><button onclick='b()'>Run</button><button onclick='s()'>Stop</button><br/>
 <p id='tab'>
 </p>
 <script>
@@ -41,6 +41,8 @@ times = {};
 function b() {
   socket.send(document.getElementById('t').value);
 }
+
+function s() {socket.send("")};
 
 function kv_sort(obj) {
  	var s = [];

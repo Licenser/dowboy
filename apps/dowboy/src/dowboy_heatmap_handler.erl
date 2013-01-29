@@ -33,7 +33,7 @@ syscall:::return
   @time[probefunc] = lquantize((vtimestamp - self->syscall_entry_ts[probefunc] ) / 1000, 0, 63, 2);
   self->syscall_entry_ts[probefunc] = 0;
 }
-</textarea><button onclick='b()'>Run</button><br/>
+</textarea><button onclick='b()'>Run</button><button onclick='s()'>Stop</button><br/>
 
 <canvas id='canvas' width='1024' height='512'></canvas>
 <script>
@@ -43,6 +43,8 @@ socket = undefined;
 function b() {
   socket.send(document.getElementById('t').value);
 }
+
+function s() {socket.send("")};
 
 function heat_tracer() {
 
@@ -207,6 +209,7 @@ websocket_info(_Info, Req, State) ->
 
 websocket_terminate(_Reason, _Req, {_, undefined}) ->
     ok;
+
 websocket_terminate(_Reason, _Req, {_, Handle}) ->
     erltrace:stop(Handle),
 	ok;
